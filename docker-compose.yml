@@ -1,0 +1,57 @@
+version: "3.9"
+services:
+  monitor:
+    build:
+      dockerfile: Dockerfile
+    hostname: monitor
+    command:
+      - monitor
+      #      - --skip-pg-hba
+      - --auth=trust
+      - --ssl-self-signed
+      - --run
+      - --hostname=monitor
+
+  primary:
+    build:
+      dockerfile: Dockerfile
+    hostname: primary
+    environment:
+      PGUSER: citus
+      PGDATABASE: citus
+      WAIT_FOR_IT: "monitor:5432"
+    command:
+      - coordinator
+      - --hostname=primary
+      - --name=coord0a
+      - --run
+      #      - --skip-pg-hba
+      - --pg-hba-lan
+      - --auth=trust
+      - --ssl-self-signed
+      - --candidate-priority=90
+      - --monitor=postgresql://autoctl_node@monitor/pg_auto_failover
+    ports:
+      - "5432"
+
+  standby:
+    build:
+      dockerfile: Dockerfile
+    hostname: standby
+    environment:
+      PGUSER: citus
+      PGDATABASE: citus
+      WAIT_FOR_IT: "primary:5432"
+    command:
+      - coordinator
+      - --name=coord0b
+      - --hostname=standby
+      - --run
+      - --candidate-priority=10
+      - --monitor=postgresql://autoctl_node@monitor/pg_auto_failover
+      #      - --skip-pg-hba
+      - --pg-hba-lan
+      - --auth=trust
+      - --ssl-self-signed
+    ports:
+      - "5432"
