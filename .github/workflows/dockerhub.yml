@@ -21,10 +21,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Remove 'v' prefix from Tag
+        run: echo "GIT_REF=${GITHUB_REF#v}" >> $GITHUB_ENV
+
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
           push: true
           tags: |
             dantio/pgaf-citus:latest
-            dantio/pgaf-citus:${{ github.ref_name[1:] }}
+            dantio/pgaf-citus:${{ env.GIT_REF }}
