@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.3](https://github.com/dantio/pgaf-citus/compare/v1.0.2...v1.0.3) (2023-04-17)
+
+
+### Bug Fixes
+
+* use GITHUB_REF_NAME ([3fe46b9](https://github.com/dantio/pgaf-citus/commit/3fe46b973b7b66d4b8b43fd45e0dde67b66ac72a))
+
 ### [1.0.2](https://github.com/dantio/pgaf-citus/compare/v1.0.1...v1.0.2) (2023-04-17)
 
 
