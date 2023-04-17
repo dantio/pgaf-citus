@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     hostname: monitor
     command:
-      - monitor
+      - monitor # set as monitor
       #      - --skip-pg-hba
       - --auth=trust
       - --ssl-self-signed
@@ -19,9 +19,9 @@ services:
     environment:
       PGUSER: citus
       PGDATABASE: citus
-      WAIT_FOR_IT: "monitor:5432"
+      WAIT_FOR_IT: "monitor:5432" # wait for monitor *optional
     command:
-      - coordinator
+      - coordinator # set as coordinator
       - --hostname=primary
       - --name=coord0a
       - --run
@@ -41,9 +41,9 @@ services:
     environment:
       PGUSER: citus
       PGDATABASE: citus
-      WAIT_FOR_IT: "primary:5432"
+      WAIT_FOR_IT: "primary:5432" # wait for primary *optional
     command:
-      - coordinator
+      - coordinator # set as coordinator
       - --name=coord0b
       - --hostname=standby
       - --run

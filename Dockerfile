@@ -32,6 +32,7 @@ RUN set -eux; \
   localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
 ENV LANG en_US.utf8
 
+
 # we use apt.postgresql.org
 RUN curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 RUN echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main ${PGVERSION}" > /etc/apt/sources.list.d/pgdg.list
@@ -45,6 +46,8 @@ RUN curl https://install.citusdata.com/community/deb.sh | sudo bash
 RUN apt-get update \
   && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     ${CITUS} \
+    postgresql-${PGVERSION}-topn=2.5.0.citus-1 \
+    postgresql-${PGVERSION}-hll=2.17.citus-1 \
     postgresql-${PGVERSION}-cron \
     pg-auto-failover-cli \
     postgresql-${PGVERSION}-auto-failover \
@@ -64,7 +67,11 @@ ENV XDG_DATA_HOME "${PGHOME}/.local/share"
 ENV XDG_CONFIG_HOME "${PGHOME}/.config"
 ENV PGCONF /etc/pgaf
 RUN mkdir -p "$PGCONF"
+
+# add cutom postgressql.conf
 RUN echo "include_if_exists '${PGCONF}/postgresql.conf'" >> /usr/share/postgresql/${PGVERSION}/postgresql.conf.sample
+# add citus to default PostgreSQL config
+# RUN echo "shared_preload_libraries='citus'" >> /usr/share/postgresql/${PGVERSION}/postgresql.conf.sample
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
