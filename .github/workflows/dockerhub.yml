@@ -27,4 +27,4 @@ jobs:
           push: true
           tags: |
             dantio/pgaf-citus:latest
-            dantio/pgaf-citus:${GITHUB_REF_NAME:1}
+            dantio/pgaf-citus:${{ github.ref_name[1:] }}
