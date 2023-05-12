@@ -1,4 +1,7 @@
 # dantio/pgaf-citus
+FROM golang:1.20.4-bullseye as shell2http
+RUN go install github.com/msoap/shell2http@v1.16.0
+
 FROM debian:bullseye-slim
 
 ARG PGVERSION=15
@@ -18,6 +21,7 @@ RUN apt-get update \
      curl \
      sudo \
      postgresql-common \
+     dumb-init \
   && rm -rf /var/lib/apt/lists/*
 
 # make the "en_US.UTF-8" locale so postgres will be utf-8 enabled by default
@@ -75,16 +79,22 @@ RUN echo "include_if_exists '${PGCONF}/postgresql.conf'" >> /usr/share/postgresq
 
 COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 COPY wait-for-it.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/wait-for-it.sh
+
+COPY pgcheck /usr/local/bin/
+RUN chmod +x /usr/local/bin/pgcheck
+
+COPY --from=shell2http /go/bin/shell2http /usr/local/bin/shell2http
+RUN chmod +x /usr/local/bin/shell2http
 
 USER pgaf
 
 ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/${PGVERSION}/bin
 
-STOPSIGNAL SIGINT
 EXPOSE 5432
 
 VOLUME $PGHOME
 
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/bin/dumb-init", "--", "docker-entrypoint.sh"]

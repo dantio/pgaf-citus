@@ -4,8 +4,8 @@ services:
     build:
       dockerfile: Dockerfile
     hostname: monitor
-   # volumes:
-   #  - "./pgconf:/etc/pgaf"
+    # volumes:
+    #  - "./pgconf:/etc/pgaf"
     command:
       - monitor # set as monitor
       #      - --skip-pg-hba
@@ -22,8 +22,9 @@ services:
       PGUSER: citus
       PGDATABASE: citus
       WAIT_FOR_IT: "monitor:5432" # wait for monitor *optional
-   # volumes:
-   #  - "./pgconf:/etc/pgaf"
+      HEALTHCHECK_PORT: "5433" # health checker on port 5433
+    # volumes:
+    #  - "./pgconf:/etc/pgaf"
     command:
       - coordinator # set as coordinator
       - --hostname=primary
@@ -46,8 +47,9 @@ services:
       PGUSER: citus
       PGDATABASE: citus
       WAIT_FOR_IT: "primary:5432" # wait for primary *optional
-   # volumes:
-   #  - "./pgconf:/etc/pgaf"
+      HEALTHCHECK_PORT: "5433"
+    # volumes:
+    #  - "./pgconf:/etc/pgaf"
     command:
       - coordinator # set as coordinator
       - --name=coord0b
@@ -61,3 +63,19 @@ services:
       - --ssl-self-signed
     ports:
       - "5432"
+
+  haproxy:
+    image: haproxy:2.3
+    volumes:
+      - ./haproxy:/usr/local/etc/haproxy:ro
+    ports:
+      - "8182:8182"
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "10.10.0.0/24"
+          gateway: "10.10.0.1"

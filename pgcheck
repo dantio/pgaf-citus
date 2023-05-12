@@ -1,0 +1,38 @@
+#!/bin/bash
+#
+# This script checks if a PostgreSQL server is healthy running on localhost.
+# credits to several9s: https://severalnines.com/blog/postgresql-load-balancing-using-haproxy-keepalived/,
+# https://www.percona.com/blog/postgresql-application-connection-failover-using-haproxy-with-xinetd/
+
+
+export PGDATABASE='postgres'
+export PGCONNECT_TIMEOUT=10
+
+STANDBY_CHECK="SELECT pg_is_in_recovery()"
+WRITABLE_CHECK="SHOW transaction_read_only"
+
+# Check the status of PostgreSQL
+READY=$(pg_isready 2> /dev/null)
+if [ $? -ne 0 ]; then
+    exit 1
+fi
+
+# check if in recovery mode (that means it is a 'standby')
+STANDBY=$(psql -qt -c "$STANDBY_CHECK" 2>/dev/null)
+if [ $? -ne 0 ]; then
+    exit 1
+elif echo $STANDBY | egrep -i "(t|true|on|1)" 2>/dev/null >/dev/null; then
+    echo -e "Status: 202 Accepted\n\nstandby\n"
+    exit 0
+fi
+
+# check if writable (then we consider it as a 'primary')
+READONLY=$(psql -qt -c "$WRITABLE_CHECK" 2>/dev/null)
+if [ $? -ne 0 ]; then
+    exit 1
+elif echo $READONLY | egrep -i "(f|false|off|0)" 2>/dev/null >/dev/null; then
+    echo -e "Status: 200 OK\n\nprimary\n"
+    exit 0
+fi
+
+exit 1
