@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](https://github.com/dantio/pgaf-citus/compare/v1.0.3...v1.1.0) (2023-05-25)
+
+
+### Features
+
+* add health check ([ead79d6](https://github.com/dantio/pgaf-citus/commit/ead79d62e8439b2aafff9deea64f74c57e88702b))
+
 ### [1.0.3](https://github.com/dantio/pgaf-citus/compare/v1.0.2...v1.0.3) (2023-04-17)
 
 
