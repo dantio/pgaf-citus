@@ -6,7 +6,7 @@ if [ -n "$WAIT_FOR_IT" ]; then
 fi
 
 if [ -n "$HEALTHCHECK_PORT" ]; then
-  shell2http -no-index -port="$HEALTHCHECK_PORT" -500 -cgi /health pgcheck &
+  shell2http -no-index -port="$HEALTHCHECK_PORT" -500 -log=/dev/null -cgi /health pgcheck &
 fi
 
 # Run the main container command.
