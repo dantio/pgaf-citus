@@ -46,3 +46,6 @@ hostssl replication "pgautofailover_replicator" 10.0.0.0/8 trust # The "all" key
 hostssl "app" "app" 10.0.0.0/8 trust
 
 ```
+
+## Release
+`npx standard-version`
